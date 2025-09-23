@@ -3,12 +3,28 @@
 # INCLUDE ALL COMMANDS NEEDED TO PERFORM THE LAB
 # This file will get called from capture_submission.sh
 
-# create bridge
-sw ip link add name lab-bridge type bridge
-sw ip link set lab-bridge up
+echo "Setting up bridge"
 
-# slave hosts to bridge
-sw ip link set eth1 master lab-bridge
-sw ip link set eth2 master lab-bridge
-sw ip link set eth3 master lab-bridge
-sw ip link set eth4 master lab-bridge
+# create tempfile with ethernet links names
+# since they will be named differently each time
+# (at least it is known they start with 'veth')
+echo "Creating temp file for ethernet link names"
+tmp=eth.txt
+$sw ip -brief link | awk '{print $1}' | grep -E "^veth.*" > $tmp
+
+# create bridge
+echo "Creating brige link"
+$sw sudo ip link add name lab-bridge type bridge
+$sw sudo ip link set lab-bridge up
+
+# slave ethernet links to bridge
+echo "Slaving ethernet links to bridge"
+while IFS="read -r eth_link"; do
+  $sw ip link set $eth_link master lab-bridge
+done < $tmp
+
+# clean up tempfile
+echo "Removing temp file"
+rm $tmp
+
+echo "Bridge setup done"
