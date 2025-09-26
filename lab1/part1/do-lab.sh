@@ -5,26 +5,28 @@
 
 echo "Setting up bridge"
 
-# create tempfile with ethernet links names
-# since they will be named differently each time
-# (at least it is known they start with 'veth')
-echo "Creating temp file for ethernet link names"
-tmp=eth.txt
-$sw ip -brief link | awk '{print $1}' | grep -E "^veth.*" > $tmp
+# get ethernet links
+INTERFACES=$($sw ip -o link show | awk -F: '{print $2}' | grep -v lo | grep -E 'veth')
+echo $INTERFACES
 
 # create bridge
 echo "Creating brige link"
 $sw sudo ip link add name lab-bridge type bridge
-$sw sudo ip link set lab-bridge up
 
 # slave ethernet links to bridge
 echo "Slaving ethernet links to bridge"
-while IFS="read -r eth_link"; do
-  $sw ip link set $eth_link master lab-bridge
-done < $tmp
+for interface in $INTERFACES; do
+  ip link set $interface down
+  ip link set $interface master lab-bridge
+done
+  
 
-# clean up tempfile
-echo "Removing temp file"
-rm $tmp
+# bring everything up
+echo "Bringing bridge up"
+$sw sudo ip link set lab-bridge up
+for interface in $INTERFACES; do
+  ip link set $interface up
+done
 
 echo "Bridge setup done"
+
