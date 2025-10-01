@@ -98,6 +98,12 @@ cp ./provided/onepkt.py ./lab-host2
 cp ./provided/onepkt.py ./lab-host3
 cp ./provided/onepkt.py ./lab-host4
 
+# ensure exec permissions
+docker exec clab-lab1-part1-host1 chmod +x /lab-folder/onepkt.py
+docker exec clab-lab1-part1-host2 chmod +x /lab-folder/onepkt.py
+docker exec clab-lab1-part1-host3 chmod +x /lab-folder/onepkt.py
+docker exec clab-lab1-part1-host4 chmod +x /lab-folder/onepkt.py
+
 
 # Packet tests
 # host1 to host2
