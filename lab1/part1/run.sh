@@ -4,9 +4,6 @@
 echo "Creating needed directories for lab"
 ./provided/make_dirs.sh
 
-# Warning about aliases
-echo "WARNING: Script will not function properly if aliases are not created. If unindended behavior occurs, run ./provided/make_aliases.sh to add needed aliases to bashrc and try again."
-
 # Run lab
 ./provided/capture_submission.sh
 
